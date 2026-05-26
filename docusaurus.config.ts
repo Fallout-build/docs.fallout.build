@@ -17,8 +17,12 @@ const config: Config = {
   organizationName: 'ChrisonSimtian',
   projectName: 'Falloutdocs',
 
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -78,7 +82,7 @@ const config: Config = {
           title: 'Docs',
           items: [
             {label: 'Introduction', to: '/docs/introduction'},
-            {label: 'Getting started', to: '/docs/01-getting-started/01-installation'},
+            {label: 'Getting started', to: '/docs/getting-started/installation'},
           ],
         },
         {
