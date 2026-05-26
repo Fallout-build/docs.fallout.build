@@ -109,6 +109,23 @@ const config: Config = {
       additionalLanguages: ['csharp', 'powershell', 'bash', 'yaml', 'json'],
     },
   } satisfies Preset.ThemeConfig,
+
+  themes: [
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: true,
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+        docsRouteBasePath: '/docs',
+        docsDir: 'fallout-source/docs',
+      },
+    ],
+  ],
 };
 
 export default config;
