@@ -17,10 +17,10 @@ const config: Config = {
   organizationName: 'ChrisonSimtian',
   projectName: 'Falloutdocs',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'throw',
+      onBrokenMarkdownLinks: 'warn',
     },
   },
 

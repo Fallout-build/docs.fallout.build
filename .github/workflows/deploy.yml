@@ -1,9 +1,9 @@
-# Build the Docusaurus site against ChrisonSimtian/Fallout@main and deploy
+# Build the Docusaurus site against Fallout-build/Fallout@main and deploy
 # to GitHub Pages (docs.fallout.build).
 #
 # Two checkouts:
 #   1. Self (this Falloutdocs repo) — Docusaurus config, theme, components.
-#   2. ChrisonSimtian/Fallout@main into ./fallout-source — the markdown
+#   2. Fallout-build/Fallout@main into ./fallout-source — the markdown
 #      source-of-truth for docs/.
 #
 # docusaurus.config.ts is wired to read from ./fallout-source/docs.
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout Fallout (markdown source)
         uses: actions/checkout@v6
         with:
-          repository: ChrisonSimtian/Fallout
+          repository: Fallout-build/Fallout
           ref: main
           path: fallout-source
           fetch-depth: 1
