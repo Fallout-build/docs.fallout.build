@@ -19,6 +19,7 @@ const config: Config = {
 
   onBrokenLinks: 'warn',
   markdown: {
+    format: 'detect',
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
