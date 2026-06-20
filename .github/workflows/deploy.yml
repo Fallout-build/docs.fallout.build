@@ -6,7 +6,14 @@
 #   2. Fallout-build/Fallout@main into ./fallout-source — the markdown
 #      source-of-truth for docs/.
 #
-# docusaurus.config.ts is wired to read from ./fallout-source/docs.
+# The build is dogfooded through Fallout itself (_build/Build.cs → npm).
+# docusaurus.config.ts reads from ./fallout-source/docs.
+#
+# On every deploy this workflow also:
+#   - opens a GitHub issue per NEW broken link Docusaurus reports
+#     (title "Broken Link: <link>", deduped — one open issue per link), and
+#   - cuts a `deploy-*` release recording the config + docs-source commits,
+#     for a cheap deploy history.
 #
 # Triggers:
 #   - Push to main of THIS repo (config/theme changes).
@@ -25,11 +32,6 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: false
@@ -38,6 +40,12 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      fallout_sha: ${{ steps.src.outputs.sha }}
+      broken_count: ${{ steps.brokenlinks.outputs.count }}
     steps:
       - name: Checkout docs.fallout.build (this repo)
         uses: actions/checkout@v6
@@ -51,6 +59,10 @@ jobs:
           ref: main
           path: fallout-source
           fetch-depth: 1
+
+      - name: Record docs-source commit
+        id: src
+        run: echo "sha=$(git -C fallout-source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -66,8 +78,72 @@ jobs:
       # Dogfooding: build the site with Fallout itself. The Fallout build
       # (_build/Build.cs) drives npm via Fallout's Npm tool wrapper —
       # Restore (npm ci) → BuildSite (npm run build → ./build).
+      # Output is tee'd so the next step can mine Docusaurus broken-link warnings.
       - name: Build site (Fallout)
-        run: dotnet run --project _build/_build.csproj -- BuildSite
+        run: |
+          set -o pipefail
+          dotnet run --project _build/_build.csproj -- BuildSite 2>&1 | tee build.log
+
+      # Docusaurus runs with onBrokenLinks: 'warn', so broken links don't fail
+      # the build — we surface them as deduped GitHub issues instead.
+      - name: Report broken links
+        id: brokenlinks
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          count=0
+          if [ -f build.log ]; then
+            # strip ANSI (perl, version-independent), pull each broken-link
+            # target out of Docusaurus' "Exhaustive list of broken links" report
+            perl -pe 's/\e\[[0-9;]*m//g' build.log \
+              | grep -oE 'linking to .+ \(resolved as' \
+              | sed -E 's/^linking to (.+) \(resolved as$/\1/' \
+              | sort -u > broken-links.txt || true
+            if [ -s broken-links.txt ]; then
+              count=$(wc -l < broken-links.txt | tr -d ' ')
+            fi
+          fi
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+          if [ "$count" -eq 0 ]; then
+            echo "✅ No broken links."
+            exit 0
+          fi
+          echo "Found $count broken link(s):"
+          cat broken-links.txt
+
+          # Labels (idempotent) so we can both tag and reliably look up our issues.
+          gh label create broken-link --color FBCA04 --description "Broken link detected during docs deploy" --force >/dev/null 2>&1 || true
+          gh label create bug --color d73a4a --description "Something isn't working" --force >/dev/null 2>&1 || true
+
+          # Snapshot already-open broken-link issue titles once (deduplication).
+          gh issue list --state open --label broken-link --limit 500 \
+            --json title --jq '.[].title' > open-issues.txt || true
+
+          while IFS= read -r link; do
+            [ -n "$link" ] || continue
+            title="Broken Link: $link"
+            if grep -Fxq "$title" open-issues.txt; then
+              echo "already tracked: $title"
+              continue
+            fi
+            {
+              echo "Docusaurus reported a broken link while building **docs.fallout.build**."
+              echo
+              echo "- **Broken link:** \`$link\`"
+              echo "- **First detected by deploy run:** $RUN_URL"
+              echo
+              echo "The markdown source-of-truth lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under \`docs/\` (or this repo's Docusaurus config). Fix the reference there and close this issue."
+              echo
+              echo "_Opened automatically by the deploy workflow. One issue is kept open per unique broken link — recurrences do not open duplicates._"
+            } > issue-body.md
+            gh issue create --title "$title" --label broken-link --label bug --body-file issue-body.md
+            echo "opened: $title"
+          done < broken-links.txt
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
@@ -78,6 +154,9 @@ jobs:
     name: deploy
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -85,3 +164,41 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  release:
+    name: release
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      # A lightweight release per successful deploy — cheap, browsable history
+      # of what was published and which source commits produced it.
+      - name: Create deploy release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FALLOUT_SHA: ${{ needs.build.outputs.fallout_sha }}
+          BROKEN_COUNT: ${{ needs.build.outputs.broken_count }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +'%Y.%m.%d')
+          TAG="deploy-${DATE}.${{ github.run_number }}"
+          {
+            echo "Automated snapshot of a **docs.fallout.build** deploy."
+            echo
+            echo "- **Config commit (this repo):** \`${{ github.sha }}\`"
+            echo "- **Docs source (Fallout-build/Fallout@main):** \`${FALLOUT_SHA:-unknown}\`"
+            echo "- **Broken links detected:** ${BROKEN_COUNT:-0}"
+            echo "- **Deploy run:** $RUN_URL"
+            echo "- **Live site:** https://docs.fallout.build"
+          } > notes.md
+          gh release create "$TAG" \
+            --title "Deploy $DATE (#${{ github.run_number }})" \
+            --notes-file notes.md \
+            --target "${{ github.sha }}"

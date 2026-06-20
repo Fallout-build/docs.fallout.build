@@ -1,56 +1,44 @@
 # docs.fallout.build
 
-Docusaurus build that publishes [Fallout](https://github.com/Fallout-build/Fallout)'s documentation at **[docs.fallout.build](https://docs.fallout.build)**.
+[![deploy](https://github.com/Fallout-build/docs.fallout.build/actions/workflows/deploy.yml/badge.svg)](https://github.com/Fallout-build/docs.fallout.build/actions/workflows/deploy.yml)
+[![last deploy](https://img.shields.io/github/v/release/Fallout-build/docs.fallout.build?sort=date&display_name=tag&label=last%20deploy)](https://github.com/Fallout-build/docs.fallout.build/releases)
+[![broken links](https://img.shields.io/github/issues/Fallout-build/docs.fallout.build/broken-link?label=broken%20links&color=critical)](https://github.com/Fallout-build/docs.fallout.build/issues?q=is%3Aissue+is%3Aopen+label%3Abroken-link)
+[![last commit](https://img.shields.io/github/last-commit/Fallout-build/docs.fallout.build)](https://github.com/Fallout-build/docs.fallout.build/commits/main)
 
-## Architecture
+Docusaurus site that publishes [Fallout](https://github.com/Fallout-build/Fallout)'s documentation at **[docs.fallout.build](https://docs.fallout.build)**.
 
-Two repos, one site:
+## How it works
 
-- **[Fallout-build/Fallout](https://github.com/Fallout-build/Fallout)** — markdown source-of-truth lives at `docs/`. Edits land via PRs to the Fallout repo so doc changes go with the code that motivates them.
-- **This repo** — Docusaurus config, theme, components, deploy workflow. No markdown.
+- **Markdown source** lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under `docs/` — edited via PRs there, so doc changes ride with the code that motivates them.
+- **This repo** holds only the Docusaurus config, theme, and deploy workflow. No markdown.
+- **The build is dogfooded through Fallout itself** (`_build/Build.cs` drives npm via Fallout's `Npm` tool wrapper). `deploy.yml` checks out both repos, builds, and publishes to GitHub Pages.
 
-At build time, `.github/workflows/deploy.yml` checks out **both** repos: this one (config/theme) and Fallout (source). Docusaurus reads from `./fallout-source/docs` and emits the static site.
+> Two repos because the Fallout repo's Pages slot serves the apex `fallout.build`; GH Pages allows one custom domain per repo, so `docs.fallout.build` comes from here.
 
-## Why two repos
+## On every deploy
 
-The Fallout repo's GitHub Pages slot is taken by the apex domain `fallout.build`. GH Pages allows only one custom domain per repo, so a sibling subdomain (`docs.fallout.build`) must come from a different repo. This is the cheapest separation.
+- **Broken links → issues.** Docusaurus runs with `onBrokenLinks: 'warn'`, so links don't fail the build; instead each broken link gets a deduped GitHub issue titled `Broken Link: <link>` (label `broken-link`). One open issue per link — recurrences don't duplicate. New vs. already-known is then obvious from the issue list. See the [open broken links](https://github.com/Fallout-build/docs.fallout.build/issues?q=is%3Aissue+is%3Aopen+label%3Abroken-link).
+- **A `deploy-*` release** is cut recording the config commit, the Fallout docs-source commit, and broken-link count — a cheap, browsable [deploy history](https://github.com/Fallout-build/docs.fallout.build/releases).
 
-## Deploy triggers
+## Triggers
 
-- `push` to `main` of this repo — config/theme changes.
-- Daily schedule at 02:00 UTC — picks up `docs/` updates from Fallout within 24h.
-- `workflow_dispatch` — manual rebuild on demand.
-
-If you need an immediate rebuild after a Fallout `docs/` change, trigger the workflow manually from the Actions tab.
+- `push` to `main` — config/theme changes.
+- Daily at 02:00 UTC — picks up `docs/` updates from Fallout within 24h.
+- `workflow_dispatch` — manual rebuild from the Actions tab.
 
 ## Local development
 
 ```bash
-# One-time clone of the markdown source as a sibling check-out
+# One-time: clone the markdown source as a sibling check-out
 git clone https://github.com/Fallout-build/Fallout fallout-source
 
-# Live dev server (npm directly — fast iteration)
 npm ci
-npm run start   # http://localhost:3000
-
-# Production build — dogfooded through Fallout itself
-dotnet run --project _build/_build.csproj -- BuildSite   # static output in ./build
+npm run start                                            # dev server, http://localhost:3000
+dotnet run --project _build/_build.csproj -- BuildSite   # production build (dogfooded), output in ./build
 ```
 
-## Dogfooding the build
-
-The production build runs through **Fallout** (`_build/Build.cs`), which drives
-npm via Fallout's `Npm` tool wrapper: `Restore` (`npm ci`) → `BuildSite`
-(`npm run build`). CI (`deploy.yml`) invokes the same `dotnet run … BuildSite`.
-This makes the docs site a real-world consumer of Fallout — the C#/.NET build
-system documented here building a Node/Docusaurus project.
-
-Fallout is pinned to a nuget.org stable release (`Fallout.Common` in
-`_build/_build.csproj`); bump it deliberately like any other dependency.
-The `npm run start` dev server is intentionally left on plain npm for fast
-local iteration.
+The `npm run start` dev server stays on plain npm for fast iteration; only the production build goes through Fallout. Fallout is pinned to a nuget.org stable (`Fallout.Common` in `_build/_build.csproj`) — bump it deliberately, like any dependency.
 
 ## License
 
-Documentation content is MIT-licensed by the [Fallout maintainers](https://github.com/Fallout-build/Fallout/blob/main/LICENSE).
-The build chrome in this repo is also MIT-licensed.
+Documentation content is MIT-licensed by the [Fallout maintainers](https://github.com/Fallout-build/Fallout/blob/main/LICENSE). The build chrome in this repo is also MIT-licensed.
