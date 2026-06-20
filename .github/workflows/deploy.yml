@@ -58,11 +58,16 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
 
-      - name: Build site
-        run: npm run build
+      # Dogfooding: build the site with Fallout itself. The Fallout build
+      # (_build/Build.cs) drives npm via Fallout's Npm tool wrapper —
+      # Restore (npm ci) → BuildSite (npm run build → ./build).
+      - name: Build site (Fallout)
+        run: dotnet run --project _build/_build.csproj -- BuildSite
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

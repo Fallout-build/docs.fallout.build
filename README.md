@@ -29,11 +29,26 @@ If you need an immediate rebuild after a Fallout `docs/` change, trigger the wor
 # One-time clone of the markdown source as a sibling check-out
 git clone https://github.com/Fallout-build/Fallout fallout-source
 
-# Then
+# Live dev server (npm directly — fast iteration)
 npm ci
 npm run start   # http://localhost:3000
-npm run build   # static output in ./build
+
+# Production build — dogfooded through Fallout itself
+dotnet run --project _build/_build.csproj -- BuildSite   # static output in ./build
 ```
+
+## Dogfooding the build
+
+The production build runs through **Fallout** (`_build/Build.cs`), which drives
+npm via Fallout's `Npm` tool wrapper: `Restore` (`npm ci`) → `BuildSite`
+(`npm run build`). CI (`deploy.yml`) invokes the same `dotnet run … BuildSite`.
+This makes the docs site a real-world consumer of Fallout — the C#/.NET build
+system documented here building a Node/Docusaurus project.
+
+Fallout is pinned to a nuget.org stable release (`Fallout.Common` in
+`_build/_build.csproj`); bump it deliberately like any other dependency.
+The `npm run start` dev server is intentionally left on plain npm for fast
+local iteration.
 
 ## License
 

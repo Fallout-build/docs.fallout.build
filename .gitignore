@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Fallout dogfood build
+/_build/bin
+/_build/obj
+/.fallout/temp
+/.fallout/build.schema.json
