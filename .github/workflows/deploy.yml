@@ -2,7 +2,7 @@
 # to GitHub Pages (docs.fallout.build).
 #
 # Two checkouts:
-#   1. Self (this Falloutdocs repo) — Docusaurus config, theme, components.
+#   1. Self (this docs.fallout.build repo) — Docusaurus config, theme, components.
 #   2. Fallout-build/Fallout@main into ./fallout-source — the markdown
 #      source-of-truth for docs/.
 #
@@ -39,7 +39,7 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Falloutdocs (this repo)
+      - name: Checkout docs.fallout.build (this repo)
         uses: actions/checkout@v6
         with:
           fetch-depth: 1

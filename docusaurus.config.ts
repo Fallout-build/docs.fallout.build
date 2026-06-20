@@ -15,7 +15,7 @@ const config: Config = {
   baseUrl: '/',
 
   organizationName: 'Fallout-build',
-  projectName: 'Falloutdocs',
+  projectName: 'docs.fallout.build',
 
   onBrokenLinks: 'warn',
   markdown: {

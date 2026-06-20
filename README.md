@@ -1,4 +1,4 @@
-# Falloutdocs
+# docs.fallout.build
 
 Docusaurus build that publishes [Fallout](https://github.com/Fallout-build/Fallout)'s documentation at **[docs.fallout.build](https://docs.fallout.build)**.
 
