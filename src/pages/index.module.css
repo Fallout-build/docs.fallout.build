@@ -1,13 +1,120 @@
 .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
   position: relative;
   overflow: hidden;
+  text-align: center;
+  padding: 5rem 0 4.5rem;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+/* Reactor glow behind the hero. */
+.heroBanner::before {
+  content: "";
+  position: absolute;
+  inset: -40% 0 auto 0;
+  height: 150%;
+  background: radial-gradient(
+    60% 55% at 50% 30%,
+    color-mix(in srgb, var(--ifm-color-primary) 22%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Faint scan grid, masked to fade at the edges. */
+.heroBanner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: linear-gradient(
+      color-mix(in srgb, var(--ifm-color-primary) 14%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ifm-color-primary) 14%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 46px 46px;
+  mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 75%);
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+}
+
+.mark {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 0.6rem;
+  display: block;
+  color: var(--ifm-color-primary);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ifm-color-primary) 60%, transparent));
+  animation: falloutPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes falloutPulse {
+  0%, 100% {
+    opacity: 0.92;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 22px color-mix(in srgb, var(--ifm-color-primary) 80%, transparent));
+  }
+}
+
+.title {
+  font-family: var(--fallout-mono);
+  font-size: clamp(2.6rem, 8vw, 5rem);
+  margin: 0.2rem 0 0.4rem;
+  letter-spacing: 0.22em;
+  font-weight: 800;
+  color: var(--ifm-color-primary);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--ifm-color-primary) 45%, transparent);
+}
+
+.tagline {
+  font-size: 1.18rem;
+  margin: 0 0 0.25rem;
+}
+
+.sub {
+  color: var(--ifm-color-content-secondary);
+  margin: 0 0 1.6rem;
+}
+.sub b {
+  color: var(--fallout-amber);
+  font-weight: 600;
+}
+
+.term {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--fallout-mono);
+  font-size: 0.95rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-left: 3px solid var(--ifm-color-primary);
+  border-radius: 6px;
+  padding: 0.55rem 0.9rem;
+  margin-bottom: 1.7rem;
+}
+.termPrompt {
+  color: var(--ifm-color-primary);
+}
+.cursor {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1.1em;
+  background: var(--ifm-color-primary);
+  animation: falloutBlink 1.1s steps(1) infinite;
+}
+@keyframes falloutBlink {
+  50% {
+    opacity: 0;
   }
 }
 
@@ -15,4 +122,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.buttons :global(.button--primary) {
+  box-shadow: 0 0 18px color-mix(in srgb, var(--ifm-color-primary) 35%, transparent);
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 3rem 1rem 2.5rem;
+  }
 }

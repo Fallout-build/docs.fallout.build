@@ -1,30 +1,106 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Fallout docs theme — "Radioactive Vault Terminal".
+ * Dark-first (defaults to dark, respects system preference), toxic radioactive
+ * green on near-black, monospace headings, amber reserved for warnings.
  */
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --fallout-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --ifm-font-family-monospace: var(--fallout-mono);
+  --ifm-heading-font-family: var(--fallout-mono);
+  --ifm-heading-font-weight: 700;
+
+  --fallout-amber: #9a6b00;
+  --fallout-glow: rgba(158, 240, 26, 0.45);
+
+  /* Light mode — radioactive green deepened for contrast on white. */
+  --ifm-color-primary: #3d7a0a;
+  --ifm-color-primary-dark: #377009;
+  --ifm-color-primary-darker: #346909;
+  --ifm-color-primary-darkest: #2b5707;
+  --ifm-color-primary-light: #43840b;
+  --ifm-color-primary-lighter: #478c0c;
+  --ifm-color-primary-lightest: #52a30e;
+
+  --ifm-color-warning: #b8860b;
+  --ifm-code-font-size: 92%;
+  --docusaurus-highlighted-code-line-bg: rgba(158, 240, 26, 0.12);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+[data-theme="dark"] {
+  --fallout-amber: #ffd23f;
+  --fallout-glow: rgba(158, 240, 26, 0.55);
+
+  --ifm-color-primary: #9ef01a;
+  --ifm-color-primary-dark: #8ed717;
+  --ifm-color-primary-darker: #86cb16;
+  --ifm-color-primary-darkest: #6ea712;
+  --ifm-color-primary-light: #a8f235;
+  --ifm-color-primary-lighter: #b0f348;
+  --ifm-color-primary-lightest: #c5f77a;
+
+  --ifm-background-color: #0a0f0a;
+  --ifm-background-surface-color: #0f160f;
+  --ifm-navbar-background-color: #0f160f;
+  --ifm-footer-background-color: #060a06;
+
+  --ifm-font-color-base: #d7ffd0;
+  --ifm-heading-color: #eafde6;
+  --ifm-color-content-secondary: #88a886;
+
+  --ifm-color-emphasis-200: #131c13;
+  --ifm-color-emphasis-300: #1f2e1f;
+  --ifm-toc-border-color: #1f2e1f;
+  --ifm-table-border-color: #1f2e1f;
+  --ifm-hr-background-color: #1f2e1f;
+
+  --ifm-code-background: #131c13;
+  --ifm-pre-background: #0f160f;
+  --ifm-color-warning: #ffd23f;
+
+  --docusaurus-highlighted-code-line-bg: rgba(158, 240, 26, 0.16);
+}
+
+/* Brand wordmark — monospace, spaced out like a console label. */
+.navbar__title,
+.navbar__brand b {
+  font-family: var(--fallout-mono);
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+.navbar__logo img {
+  filter: drop-shadow(0 0 6px var(--fallout-glow));
+}
+
+/* Geiger-green left border on code blocks. */
+.theme-code-block {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-left: 3px solid var(--ifm-color-primary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Content links: subtle dashed underline that glows on hover. */
+.markdown a:not(.card):not(.button) {
+  text-decoration: none;
+  border-bottom: 1px dashed
+    color-mix(in srgb, var(--ifm-color-primary) 55%, transparent);
+}
+.markdown a:not(.card):not(.button):hover {
+  border-bottom-style: solid;
+  text-shadow: 0 0 10px var(--fallout-glow);
+}
+
+/* Warning admonition leans on the reserved amber accent. */
+.theme-admonition-warning {
+  --ifm-alert-border-color: var(--fallout-amber);
+}
+.theme-admonition {
+  border-left-width: 4px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ifm-color-primary) 30%, transparent);
 }

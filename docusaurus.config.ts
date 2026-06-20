@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Fallout',
   tagline: 'Build automation for C#/.NET — the hard-fork successor to NUKE',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   future: {
     v4: true,
@@ -57,11 +57,19 @@ const config: Config = {
   ],
 
   themeConfig: {
+    image: 'img/social-card.png',
     colorMode: {
+      // Dark-first brand, but honour the visitor's system preference.
+      defaultMode: 'dark',
       respectPrefersColorScheme: true,
     },
     navbar: {
       title: 'Fallout',
+      logo: {
+        alt: 'Fallout',
+        src: 'img/logo.svg',
+        srcDark: 'img/logo-dark.svg',
+      },
       items: [
         {
           type: 'docSidebar',
@@ -106,7 +114,7 @@ const config: Config = {
     },
     prism: {
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.vsDark,
       additionalLanguages: ['csharp', 'powershell', 'bash', 'yaml', 'json'],
     },
   } satisfies Preset.ThemeConfig,
