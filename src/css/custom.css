@@ -101,6 +101,26 @@
   border-left-width: 4px;
 }
 
+/* Footer is always dark (style: 'dark'); Infima's .footer--dark hardcodes a
+   gray palette, so repaint it in the vault palette with fixed greens. */
+.footer {
+  --ifm-footer-background-color: #060a06;
+  --ifm-footer-color: #88a886;
+  --ifm-footer-link-color: #b9d4b3;
+  --ifm-footer-link-hover-color: #9ef01a;
+  --ifm-footer-title-color: #9ef01a;
+  border-top: 1px solid #1f2e1f;
+}
+.footer__title {
+  font-family: var(--fallout-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.82rem;
+}
+.footer__link-item:hover {
+  text-shadow: 0 0 10px var(--fallout-glow);
+}
+
 ::selection {
   background: color-mix(in srgb, var(--ifm-color-primary) 30%, transparent);
 }
