@@ -8,7 +8,7 @@ using static Fallout.Common.Tools.Npm.NpmTasks;
 ///
 ///   dotnet run --project _build/_build.csproj -- BuildSite
 ///
-/// The actual markdown lives in Fallout-build/Fallout (docs/); CI checks it out
+/// The actual markdown lives in Fallout-build/Fallout (docs/website/); CI checks it out
 /// into ./fallout-source before this runs. This build just drives npm via
 /// Fallout's Npm tool wrapper — small on purpose, the point is to dogfood.
 /// </summary>

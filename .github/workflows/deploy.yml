@@ -4,10 +4,10 @@
 # Two checkouts:
 #   1. Self (this docs.fallout.build repo) — Docusaurus config, theme, components.
 #   2. Fallout-build/Fallout@main into ./fallout-source — the markdown
-#      source-of-truth for docs/.
+#      source-of-truth for docs/website/.
 #
 # The build is dogfooded through Fallout itself (_build/Build.cs → npm).
-# docusaurus.config.ts reads from ./fallout-source/docs.
+# docusaurus.config.ts reads from ./fallout-source/docs/website.
 #
 # On every deploy this workflow also:
 #   - opens a GitHub issue per NEW broken link Docusaurus reports
@@ -17,7 +17,7 @@
 #
 # Triggers:
 #   - Push to main of THIS repo (config/theme changes).
-#   - Daily schedule (catches Fallout/docs/** updates without needing a
+#   - Daily schedule (catches Fallout/docs/website/** updates without needing a
 #     repository_dispatch token in Fallout).
 #   - Manual workflow_dispatch.
 
@@ -28,7 +28,7 @@ on:
     branches:
       - main
   schedule:
-    # 02:00 UTC daily — picks up changes to Fallout/docs/ within 24h.
+    # 02:00 UTC daily — picks up changes to Fallout/docs/website/ within 24h.
     - cron: '0 2 * * *'
   workflow_dispatch:
 
@@ -137,7 +137,7 @@ jobs:
               echo "- **Broken link:** \`$link\`"
               echo "- **First detected by deploy run:** $RUN_URL"
               echo
-              echo "The markdown source-of-truth lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under \`docs/\` (or this repo's Docusaurus config). Fix the reference there and close this issue."
+              echo "The markdown source-of-truth lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under \`docs/website/\` (or this repo's Docusaurus config). Fix the reference there and close this issue."
               echo
               echo "_Opened automatically by the deploy workflow. One issue is kept open per unique broken link — recurrences do not open duplicates._"
             } > issue-body.md
