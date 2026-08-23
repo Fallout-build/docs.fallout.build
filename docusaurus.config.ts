@@ -102,7 +102,12 @@ const config: Config = {
           title: 'Origin',
           items: [
             {label: 'Originally NUKE', href: 'https://github.com/nuke-build/nuke'},
-            {label: 'Migration guide', to: '/docs/migration/from-nuke'},
+            // Migration/ isn't part of the site's content path (docs/website/) —
+            // link straight to the source file on GitHub.
+            {
+              label: 'Migration guide',
+              href: 'https://github.com/Fallout-build/Fallout/blob/main/docs/Migration/from-nuke.md',
+            },
           ],
         },
       ],
