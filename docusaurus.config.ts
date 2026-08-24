@@ -36,17 +36,13 @@ const config: Config = {
       {
         docs: {
           // CI checks out the Fallout repo into ./fallout-source/ so its
-          // docs/ folder is the markdown source for this build.
-          path: './fallout-source/docs',
+          // docs/website/ folder is the markdown source for this build.
+          // (docs/ also holds non-website reference material — dependencies.md,
+          // roadmap.md, cli-tools/ — that intentionally lives outside this path.)
+          path: './fallout-source/docs/website',
           routeBasePath: '/docs',
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/Fallout-build/Fallout/tree/main/',
-          exclude: [
-            '**/rebrand-plan.md',
-            '**/roadmap.md',
-            '**/dependencies.md',
-            '**/cli-tools/**',
-          ],
         },
         blog: false,
         theme: {
@@ -106,7 +102,12 @@ const config: Config = {
           title: 'Origin',
           items: [
             {label: 'Originally NUKE', href: 'https://github.com/nuke-build/nuke'},
-            {label: 'Migration guide', to: '/docs/migration/from-nuke'},
+            // Migration/ isn't part of the site's content path (docs/website/) —
+            // link straight to the source file on GitHub.
+            {
+              label: 'Migration guide',
+              href: 'https://github.com/Fallout-build/Fallout/blob/main/docs/Migration/from-nuke.md',
+            },
           ],
         },
       ],
@@ -131,7 +132,7 @@ const config: Config = {
         highlightSearchTermsOnTargetPage: true,
         explicitSearchResultPath: true,
         docsRouteBasePath: '/docs',
-        docsDir: 'fallout-source/docs',
+        docsDir: 'fallout-source/docs/website',
       },
     ],
   ],

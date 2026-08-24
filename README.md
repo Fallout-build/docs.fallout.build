@@ -9,7 +9,7 @@ Docusaurus site that publishes [Fallout](https://github.com/Fallout-build/Fallou
 
 ## How it works
 
-- **Markdown source** lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under `docs/` — edited via PRs there, so doc changes ride with the code that motivates them.
+- **Markdown source** lives in [Fallout-build/Fallout](https://github.com/Fallout-build/Fallout) under `docs/website/` — edited via PRs there, so doc changes ride with the code that motivates them.
 - **This repo** holds only the Docusaurus config, theme, and deploy workflow. No markdown.
 - **The build is dogfooded through Fallout itself** (`_build/Build.cs` drives npm via Fallout's `Npm` tool wrapper). `deploy.yml` checks out both repos, builds, and publishes to GitHub Pages.
 
@@ -23,7 +23,7 @@ Docusaurus site that publishes [Fallout](https://github.com/Fallout-build/Fallou
 ## Triggers
 
 - `push` to `main` — config/theme changes.
-- Daily at 02:00 UTC — picks up `docs/` updates from Fallout within 24h.
+- Daily at 02:00 UTC — picks up `docs/website/` updates from Fallout within 24h.
 - `workflow_dispatch` — manual rebuild from the Actions tab.
 
 ## Local development
